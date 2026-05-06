@@ -1,0 +1,115 @@
+*imauto.txt*       Auto-switch macOS input method around insert mode
+
+==============================================================================
+CONTENTS                                                  *imauto-contents*
+
+  1. Introduction ........................... |imauto-intro|
+  2. Requirements ........................... |imauto-requirements|
+  3. Installation ........................... |imauto-install|
+  4. Configuration .......................... |imauto-config|
+  5. Commands ............................... |imauto-commands|
+  6. API .................................... |imauto-api|
+  7. Bundled helper ......................... |imauto-helper|
+
+==============================================================================
+1. INTRODUCTION                                              *imauto-intro*
+
+`imauto.nvim` switches the macOS input method to a default (typically
+ABC / English) when you leave insert mode, and restores the previous input
+method when you re-enter insert mode.
+
+No external CLI is required: a small Swift helper that calls Carbon's TIS
+API is bundled with the plugin and compiled on first use.
+
+==============================================================================
+2. REQUIREMENTS                                       *imauto-requirements*
+
+- macOS
+- Neovim 0.9+ (0.10+ recommended)
+- Xcode Command Line Tools (`xcode-select --install`) for `swiftc`
+
+==============================================================================
+3. INSTALLATION                                            *imauto-install*
+
+Using lazy.nvim: >lua
+
+  {
+    "your-handle/imauto.nvim",
+    build = "make build",
+    event = "VeryLazy",
+    opts = {},
+  }
+<
+
+The `build` hook compiles `bin/imauto` at install time. If you skip it,
+the plugin auto-builds on first use.
+
+==============================================================================
+4. CONFIGURATION                                            *imauto-config*
+
+Default configuration: >lua
+
+  require("imauto").setup({
+    default_im = "com.apple.keylayout.ABC",
+    cmd = nil,
+    set_default_events = { "InsertLeave", "CmdlineLeave" },
+    set_previous_events = { "InsertEnter" },
+    restore_focus_state = true,
+    async = true,
+  })
+<
+
+Options:
+
+  default_im~
+    Input method identifier to switch to when leaving insert mode.
+
+  cmd~
+    Override the IM-switching binary (e.g. "macism"). When nil, the bundled
+    helper is used.
+
+  set_default_events~
+    Autocmd events that trigger switching to `default_im`.
+    Set to `{}` to disable.
+
+  set_previous_events~
+    Autocmd events that trigger restoring the previously used input method.
+    Set to `{}` to disable.
+
+  restore_focus_state~
+    When true, remembers the IM on FocusLost and restores it on FocusGained.
+
+  async~
+    Run the IM-switching command asynchronously. Recommended.
+
+==============================================================================
+5. COMMANDS                                               *imauto-commands*
+
+  :ImautoToggle    Toggle between default and previous IM.
+  :ImautoGet       Print the current input method.
+  :ImautoSet {id}  Set the input method to {id}.
+
+==============================================================================
+6. API                                                         *imauto-api*
+
+  require("imauto").setup(opts)
+  require("imauto").toggle()
+  require("imauto").set(lang)
+  require("imauto").get()
+
+==============================================================================
+7. BUNDLED HELPER                                           *imauto-helper*
+
+The plugin ships `swift/imauto.swift`, a ~50-line Carbon TIS wrapper that
+handles reading and setting the active input source. After every select it
+verifies the result and retries once with a short delay to mitigate a known
+macOS quirk where switching to CJK IMEs sometimes updates the menu bar without
+activating the actual input mode.
+
+Build manually: >sh
+
+  make build
+  make clean
+<
+
+vim:tw=78:ts=8:ft=help:norl:

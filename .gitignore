@@ -1,0 +1,8 @@
+doc/tags
+*.swp
+*.swo
+.DS_Store
+.luarc.json
+.luarc.jsonc
+.omc/
+bin/
