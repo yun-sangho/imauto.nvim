@@ -27,7 +27,7 @@ the plugin and built on first use.
 
 ```lua
 {
-  "your-handle/imauto.nvim",
+  "yun-sangho/imauto.nvim",
   build = "make build",
   event = "VeryLazy",
   opts = {},
@@ -42,7 +42,7 @@ optional but recommended.
 
 ```lua
 use({
-  "your-handle/imauto.nvim",
+  "yun-sangho/imauto.nvim",
   run = "make build",
   config = function()
     require("imauto").setup({})
