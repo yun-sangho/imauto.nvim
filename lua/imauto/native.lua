@@ -6,9 +6,17 @@ local function plugin_root()
   return path
 end
 
+local function fs_stat(path)
+  return vim.uv and vim.uv.fs_stat(path) or vim.loop.fs_stat(path)
+end
+
 local function file_exists(path)
-  local stat = vim.uv and vim.uv.fs_stat(path) or vim.loop.fs_stat(path)
-  return stat ~= nil
+  return fs_stat(path) ~= nil
+end
+
+local function mtime_sec(path)
+  local s = fs_stat(path)
+  return s and s.mtime.sec or nil
 end
 
 function M.bundled_binary_path()
@@ -38,7 +46,17 @@ end
 
 function M.resolve()
   local bundled = M.bundled_binary_path()
-  if file_exists(bundled) then
+  local bin_m = mtime_sec(bundled)
+  if bin_m then
+    local src_m = mtime_sec(M.swift_source_path())
+    if src_m and bin_m < src_m then
+      vim.notify(
+        "[imauto] bin/imauto is older than swift/imauto.swift. "
+          .. "Run `:Lazy build imauto.nvim` (or `make build` in the plugin "
+          .. "directory) to pick up source changes.",
+        vim.log.levels.WARN
+      )
+    end
     return bundled
   end
 
