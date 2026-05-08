@@ -63,7 +63,6 @@ require("imauto").setup({
   set_default_events = { "InsertLeave", "CmdlineLeave" },
   set_previous_events = { "InsertEnter" },
   restore_focus_state = true,
-  async = true,
 })
 ```
 
@@ -74,7 +73,6 @@ require("imauto").setup({
 | `set_default_events` | Events that trigger switching to `default_im`. `{}` disables. |
 | `set_previous_events` | Events that restore the previous IM. `{}` disables. |
 | `restore_focus_state` | Remember IM on `FocusLost`, restore on `FocusGained`. |
-| `async` | Run IM-switch commands without blocking the UI. |
 
 ## Commands
 

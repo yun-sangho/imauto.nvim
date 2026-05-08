@@ -24,7 +24,7 @@ function M.set_lang(lang)
   if not state.bin or not lang or lang == "" then
     return
   end
-  if state.cfg.async and vim.system then
+  if vim.system then
     vim.system({ state.bin, lang }, { detach = true })
   else
     vim.fn.jobstart({ state.bin, lang }, { detach = true })
