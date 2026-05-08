@@ -8,7 +8,6 @@ M.defaults = {
   set_default_events = { "InsertLeave", "CmdlineLeave" },
   set_previous_events = { "InsertEnter" },
   restore_focus_state = true,
-  async = true,
 }
 
 M.options = vim.deepcopy(M.defaults)

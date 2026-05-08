@@ -55,7 +55,6 @@ Default configuration: >lua
     set_default_events = { "InsertLeave", "CmdlineLeave" },
     set_previous_events = { "InsertEnter" },
     restore_focus_state = true,
-    async = true,
   })
 <
 
@@ -78,9 +77,6 @@ Options:
 
   restore_focus_state~
     When true, remembers the IM on FocusLost and restores it on FocusGained.
-
-  async~
-    Run the IM-switching command asynchronously. Recommended.
 
 ==============================================================================
 5. COMMANDS                                               *imauto-commands*
