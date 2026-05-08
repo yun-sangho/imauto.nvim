@@ -10,11 +10,8 @@ M.defaults = {
   restore_focus_state = true,
 }
 
-M.options = vim.deepcopy(M.defaults)
-
 function M.setup(opts)
-  M.options = vim.tbl_deep_extend("force", vim.deepcopy(M.defaults), opts or {})
-  return M.options
+  return vim.tbl_deep_extend("force", vim.deepcopy(M.defaults), opts or {})
 end
 
 return M
