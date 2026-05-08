@@ -51,7 +51,6 @@ Default configuration: >lua
 
   require("imauto").setup({
     default_im = "com.apple.keylayout.ABC",
-    cmd = nil,
     set_default_events = { "InsertLeave", "CmdlineLeave" },
     set_previous_events = { "InsertEnter" },
     restore_focus_state = true,
@@ -62,10 +61,6 @@ Options:
 
   default_im~
     Input method identifier to switch to when leaving insert mode.
-
-  cmd~
-    Override the IM-switching binary (e.g. "macism"). When nil, the bundled
-    helper is used.
 
   set_default_events~
     Autocmd events that trigger switching to `default_im`.

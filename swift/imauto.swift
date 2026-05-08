@@ -4,8 +4,10 @@ import Foundation
 // imauto: tiny Carbon TIS wrapper used by imauto.nvim.
 //
 // Usage:
-//   imauto                  -> prints the current input source id
-//   imauto <inputSourceId>  -> selects the given input source
+//   imauto                       -> prints the current input source id
+//   imauto <inputSourceId>       -> selects the given input source
+//   imauto --swap <inputSourceId> -> prints current id, then selects the given
+//                                    one (single-process read-then-set)
 //
 // Exit codes: 0 on success, non-zero on failure.
 
@@ -67,5 +69,12 @@ if args.count == 2 {
   exit(selectSource(id: args[1]) ? 0 : 2)
 }
 
-FileHandle.standardError.write(Data("usage: imauto [<inputSourceId>]\n".utf8))
+if args.count == 3 && args[1] == "--swap" {
+  if let id = currentSourceID() {
+    print(id)
+  }
+  exit(selectSource(id: args[2]) ? 0 : 2)
+}
+
+FileHandle.standardError.write(Data("usage: imauto [<inputSourceId> | --swap <inputSourceId>]\n".utf8))
 exit(64)
