@@ -37,7 +37,11 @@ function M.toggle()
   end
   local cur = M.get_current_lang()
   if cur == state.cfg.default_im then
-    M.set_lang(state.previous_lang or state.cfg.default_im)
+    if not state.previous_lang or state.previous_lang == state.cfg.default_im then
+      vim.notify("[imauto] no previous IM recorded yet", vim.log.levels.INFO)
+      return
+    end
+    M.set_lang(state.previous_lang)
   else
     state.previous_lang = cur
     M.set_lang(state.cfg.default_im)
@@ -54,7 +58,7 @@ function M.attach(cfg)
   state.cfg = cfg
   state.bin = bin
   state.last_global_lang = cfg.default_im
-  state.previous_lang = cfg.default_im
+  state.previous_lang = nil
 
   local group = vim.api.nvim_create_augroup("Imauto", { clear = true })
 
