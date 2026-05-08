@@ -15,7 +15,7 @@ function M.get_current_lang()
   end
   local out = vim.fn.system({ state.bin })
   if vim.v.shell_error ~= 0 then
-    return state.cfg and state.cfg.default_im or nil
+    return nil
   end
   return (out:gsub("%s+", ""))
 end
@@ -36,6 +36,10 @@ function M.toggle()
     return
   end
   local cur = M.get_current_lang()
+  if not cur then
+    vim.notify("[imauto] failed to read current input source", vim.log.levels.WARN)
+    return
+  end
   if cur == state.cfg.default_im then
     if not state.previous_lang or state.previous_lang == state.cfg.default_im then
       vim.notify("[imauto] no previous IM recorded yet", vim.log.levels.INFO)
