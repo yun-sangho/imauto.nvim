@@ -35,8 +35,9 @@ the plugin and built on first use.
 ```
 
 The `build` hook compiles `bin/imauto` once at install/update time. The
-plugin also auto-builds on first use if the binary is missing, so the hook is
-optional but recommended.
+plugin also auto-builds when the binary is missing or older than
+`swift/imauto.swift`, so the hook is optional but recommended for a
+warm cache.
 
 ### packer.nvim
 

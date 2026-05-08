@@ -42,7 +42,8 @@ Using lazy.nvim: >lua
 <
 
 The `build` hook compiles `bin/imauto` at install time. If you skip it,
-the plugin auto-builds on first use.
+the plugin auto-builds when the binary is missing or older than
+swift/imauto.swift.
 
 ==============================================================================
 4. CONFIGURATION                                            *imauto-config*
