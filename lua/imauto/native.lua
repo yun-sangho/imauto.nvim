@@ -36,14 +36,7 @@ function M.build()
   return bin
 end
 
-function M.resolve(explicit_cmd)
-  if explicit_cmd and explicit_cmd ~= "" then
-    if vim.fn.executable(explicit_cmd) == 1 then
-      return explicit_cmd
-    end
-    return nil, "configured cmd not executable: " .. explicit_cmd
-  end
-
+function M.resolve()
   local bundled = M.bundled_binary_path()
   if file_exists(bundled) then
     return bundled

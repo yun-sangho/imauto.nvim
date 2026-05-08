@@ -9,6 +9,10 @@ local state = {
   previous_lang = nil,
 }
 
+local function strip(s)
+  return (s:gsub("%s+", ""))
+end
+
 function M.get_current_lang()
   if not state.bin then
     return nil
@@ -17,7 +21,52 @@ function M.get_current_lang()
   if vim.v.shell_error ~= 0 then
     return nil
   end
-  return (out:gsub("%s+", ""))
+  return strip(out)
+end
+
+local function spawn_async(args, cb)
+  if vim.system then
+    vim.system(args, { text = true }, function(obj)
+      if obj.code == 0 then
+        cb(strip(obj.stdout or ""))
+      else
+        cb(nil)
+      end
+    end)
+  else
+    local stdout_chunks = {}
+    vim.fn.jobstart(args, {
+      stdout_buffered = true,
+      on_stdout = function(_, data)
+        stdout_chunks = data or {}
+      end,
+      on_exit = function(_, code)
+        if code == 0 and stdout_chunks[1] then
+          cb(strip(stdout_chunks[1]))
+        else
+          cb(nil)
+        end
+      end,
+    })
+  end
+end
+
+function M.read_current_lang_async(cb)
+  if not state.bin then
+    cb(nil)
+    return
+  end
+  spawn_async({ state.bin }, cb)
+end
+
+-- Single-process read-then-set: prints the prior IM, then selects new_id.
+-- Halves fork+exec cost on InsertLeave/CmdlineLeave.
+function M.swap_async(new_id, cb)
+  if not state.bin or not new_id or new_id == "" then
+    cb(nil)
+    return
+  end
+  spawn_async({ state.bin, "--swap", new_id }, cb)
 end
 
 function M.set_lang(lang)
@@ -53,7 +102,7 @@ function M.toggle()
 end
 
 function M.attach(cfg)
-  local bin, err = native.resolve(cfg.cmd)
+  local bin, err = native.resolve()
   if not bin then
     vim.notify("[imauto] " .. tostring(err), vim.log.levels.ERROR)
     return
@@ -71,8 +120,11 @@ function M.attach(cfg)
       group = group,
       pattern = "*",
       callback = function()
-        state.previous_lang = M.get_current_lang() or state.previous_lang
-        M.set_lang(cfg.default_im)
+        M.swap_async(cfg.default_im, function(prev)
+          if prev and prev ~= "" then
+            state.previous_lang = prev
+          end
+        end)
         state.last_global_lang = cfg.default_im
       end,
     })
@@ -94,7 +146,11 @@ function M.attach(cfg)
       group = group,
       pattern = "*",
       callback = function()
-        state.last_global_lang = M.get_current_lang() or state.last_global_lang
+        M.read_current_lang_async(function(cur)
+          if cur and cur ~= "" then
+            state.last_global_lang = cur
+          end
+        end)
       end,
     })
 
